@@ -1,0 +1,26 @@
+import express from 'express';
+import OpenAI from 'openai';
+import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const app = express();
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+app.use(cors());
+app.use(express.static('public'));
+app.use(express.json());
+
+app.post('/ask', async (req, res) => {
+  const question = req.body.question;
+  const chat = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [{ role: 'user', content: question }],
+  });
+  res.json({ answer: chat.choices[0].message.content });
+});
+
+app.listen(3000, () => {
+  console.log('Malook.ai is running at http://localhost:3000');
+});
